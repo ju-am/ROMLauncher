@@ -1,0 +1,14 @@
+{
+  "name": "ROML",
+  "version": "1.0.0",
+  "description": "ROM Launcher",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "TLOZ",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^4.0.6"
+  }
+}

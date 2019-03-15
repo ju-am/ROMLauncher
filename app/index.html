@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>ROM Launcher</title>
+		<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+		<script src="./jquery-3.3.1.min.js"></script>
+		<!--<script src="./jquery-ui.min.js"></script>-->
+		<script src="./logic.js"></script>
+		<script>if (window.module) module = window.module;</script>
+		<link rel="stylesheet" type="text/css" href="theme.css"/>
+	</head>
+	<body>
+    <div id="background0" class="background"></div>
+    <div id="background1" class="background"></div>
+    <div id="background2" class="background"></div>
+    <div id="resize_area">
+        <div id="titlebar">
+            <div id="titlebar_name">ROM Launcher</div>
+            <button id="titlebar_settings" class="titlebar_control">EDIT</button>
+            <button id="titlebar_min" class="titlebar_control">&#x2572;</button>
+            <button id="titlebar_max" class="titlebar_control">&#x2571;</button>
+            <button id="titlebar_close" class="titlebar_control">&#x2573;</button>
+        </div>
+		<div id="wrapper" class="content_wrapper">
+			<div id="systems">
+				<!--<div class="system"></div>-->
+			</div>
+			<div id="roms_wrapper" style="display:grid">
+				<div id="roms_container">
+                    <div id="roms">
+                        <!--<div class="rom">ROM NAME</div>-->
+                    </div>
+				</div>
+				<div id="search_area">
+					<!--<div id="search_bar_wrapper">-->
+                    <input id="search_bar" type="text" placeholder="Search..." oninput="filterRomList()">
+                    <button onclick="document.getElementById('search_bar').value = ''; filterRomList()" id="clear_search_input">CLEAR</button>
+					<!--</div>-->
+				</div>
+			</div>
+            <div id="settings_wrapper" style="display:none">
+                <div id="settings_editor">
+                
+                    <!--EMU EXE-->
+                    <div class="settings_category" style="display:inline-block; margin-bottom:2px;">
+                        <div class="settings_label">Currently Editing System ID</div>
+                        <input class="settings_currently_editing settings_input" placeholder="New System" disabled>
+                    </div>
+                
+                    <!--CONTAINER : DISPLAY NAME / UNIQUE ID-->
+                    <div style="width:100%; display:grid; grid-template-columns: 70% 1fr; column-gap:2px; margin-bottom:2px">
+                        <!--DISPLAY NAME-->
+                        <div class="settings_category" style="display:inline-block;">
+                            <div class="settings_label">Launcher Prefix</div>
+                            <div style="display:grid; grid-template-columns: 1fr;">
+                                <input class="settings_display_name settings_input">
+                                <!--<button class="settings_add_rem settings_moveup" style="font-size:14px;">&#x25b2;</button>-->
+                                <!--<button class="settings_add_rem settings_movedown" style="font-size:14px;">&#x25bc;</button>-->
+                            </div>
+                        </div>
+                        <!--UNIQUE ID-->
+                        <div class="settings_category" style="display:inline-block;">
+                            <div class="settings_label">Unique ID</div>
+                            <input class="settings_unique_id settings_input">
+                        </div>
+                    </div>
+                    
+                    <!--EMU EXE-->
+                    <div class="settings_category" style="display:inline-block; margin-bottom:2px;">
+                        <div class="settings_label">Emulator Executable Path</div>
+                        <input class="settings_emu_path settings_input">
+                    </div>
+                    
+                    <!--EMU ARGS-->
+                    <div class="settings_category" style="display:inline-block; margin-bottom: 2px;">
+                        <div class="settings_label">Emulator Arguments</div>
+                        <!--INPUT CONTAINER : EMU ARGS LIST-->
+                        <div style="display:grid; row-gap:2px;">
+                            <!--INPUT CONTAINER : EMU ARG-->
+                            <div style="display: grid; grid-template-columns: 1fr 32px 32px;" >
+                                <input class="settings_emu_arg settings_input">
+                                <button class="settings_add_rem settings_input_add">&#xFF0B;</button>
+                                <button class="settings_add_rem settings_input_rem">&#xFF0D;</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!--ROM DIRS-->
+                    <div class="settings_category" style="display:inline-block; margin-bottom: 2px;">
+                        <div class="settings_label">ROM Directories</div>
+                        <!--INPUT CONTAINER : ROM DIR LIST-->
+                        <div style="display:grid; row-gap:2px;">
+                            <!--INPUT CONTAINER : ROM DIR-->
+                            <div style="display: grid; grid-template-columns: 1fr 32px 32px;" >
+                                <input class="settings_rom_dir settings_input">
+                                <button class="settings_add_rem settings_input_add">&#xFF0B;</button>
+                                <button class="settings_add_rem settings_input_rem">&#xFF0D;</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!--FILE TYPES-->
+                    <div class="settings_category" style="display:inline-block; margin-bottom: 2px;">
+                        <div class="settings_label">ROM File Types</div>
+                        <!--INPUT CONTAINER : FILE TYPES LIST-->
+                        <div style="display:grid; row-gap:2px;">
+                            <!--INPUT CONTAINER : FILE TYPE-->
+                            <div style="display: grid; grid-template-columns: 1fr 32px 32px;" >
+                                <input class="settings_file_type settings_input">
+                                <button class="settings_add_rem settings_input_add">&#xFF0B;</button>
+                                <button class="settings_add_rem settings_input_rem">&#xFF0D;</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!--CSS GRADIENT-->
+                    <div class="settings_category" style="display:inline-block; margin-bottom:2px;">
+                        <div class="settings_label">CSS Background</div>
+                        <input class="settings_css_gradient settings_input">
+                    </div>
+                    
+                    <!--ORDER-->
+                    <div class="settings_category" style="display:inline-block; margin-bottom:2px;">
+                        <div class="settings_label">Order</div>
+                        <input class="settings_order settings_input">
+                    </div>
+                    
+                    <div id="settings_editor_message">
+                        DEBUG_MESSAGE
+                        <button id="settings_editor_message_close">&#x2573;</button>
+                    </div>
+                    
+                    <div class="settings_category">
+                        <div style="display: grid; grid-template-columns: 30% 70%; column-gap: 2px;" >
+                            <button id="settings_delete_system" class="settings_add_rem" style="font-size:13px; height:32px; width:100%;">Delete</button>
+                            <button id="settings_save_system" class="settings_add_rem" style="font-size:13px; height:32px; width:100%;">Save</button>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+		</div>
+    </div>
+    <div id="foreground0" class="background">
+        <div class="spinner"></div>
+    </div>
+	</body>
+</html>
