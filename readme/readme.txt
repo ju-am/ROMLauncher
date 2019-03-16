@@ -1,5 +1,6 @@
 --------------------------------------------------------------------------------
-ROM Launcher V.1.0--------------------------------------------------------------
+ROM Launcher--------------------------------------------------------------------
+https://github.com/ButcheredGenre/ROMLauncher-----------------------------------
 --------------------------------------------------------------------------------
 
 TOC
@@ -17,8 +18,7 @@ TOC
 CHANGELOG-----------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-[15.03.2019] V.1.0
-    - initial release
+    https://github.com/ButcheredGenre/ROMLauncher
 
 --------------------------------------------------------------------------------
 SETUP---------------------------------------------------------------------------
@@ -46,8 +46,9 @@ is used for the system icon. The ROM Launcher will search for e.g. gba.png in
 the /icons/ directory.
 
 >---[Emulator Executable Path] : The path (absolute/relative) or command to
-launch the emulator. You can use ./../ to denote the parent directory of the
-executable (or ./../../ for the folder above, and so on).
+launch the emulator. Use the 'Search File' button to search for the emulator
+directly. You can then use the 'Make Relative' button to convert the path to
+a relative path, if possible (this is optional).
 
 >---[Emulator Arguments] : Optional arguments to use with the emulator. Enter
 every argument individually. When arguments are used, the ROM-file should be
@@ -55,6 +56,9 @@ added as its own argument with %ROMFILE%. Again, this is usually not needed
 unless you want to launch e.g. retroarch with a specific core.
 
 >---[ROM Directories] : One or more directories containing ROMs for this system.
+You can use the 'Search Directory' button to search for directories, then use
+the 'Make Relative' button to convert the paths to relative paths, if possible
+(this is optional).
 
 >---[ROM File Types] : File-types of ROMs. Add without punctuation.
 
@@ -83,7 +87,8 @@ a previous configuration from the settings_backup.json file.
 --------------------------------------------------------------------------------
 
 If you feel like it, you can edit the settings.json directly. This makes it
-easier to e.g. find & replace strings, if needed.
+easier to e.g. find & replace strings, if needed. Overall, this is not
+recommended.
 
 --------------------------------------------------------------------------------
 IN CASE OF ERROR----------------------------------------------------------------
@@ -100,7 +105,7 @@ configuration at least twice.
 MISSING OR INCORRECT IMAGES-----------------------------------------------------
 --------------------------------------------------------------------------------
 
-You'll very likely see missing images after configuring a system.
+You'll very likely see missing images after setting up a new system.
 System icons need to be placed in the /icons/ folder. Icons need to be PNGs and
 named after the system's unique ID. E.g. if your unique system ID is 'gba', your
 icon should be called 'gba.png'. Icons need to be 32x32 pixels in size.

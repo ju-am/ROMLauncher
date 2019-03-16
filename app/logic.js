@@ -608,26 +608,13 @@ function initializeLauncher() {
     // $('#systems').append('<div id="sys_empty"><img class="system_icon" src=./img/add_sys.png /></div>');
     $('#systems').append('<div id="sys_empty"><img class="system_icon" src=./img/add_sys.png /></div>');
     
-    // Re-order system elements according to their order value
-    var previous;
-    var previousOrder;
-    var current;
-    var currentOrder;
-    $('.system').each(function() {
-        previous = $(this);
-        previousOrder = $(this).data($(this).attr('id')).order;
-        $('.system').each(function() {
-            current = $(this);
-            currentOrder = $(this).data($(this).attr('id')).order;
-            if (parseInt(currentOrder) < parseInt(previousOrder)) {
-                $(this).detach().insertBefore(previous);
-            }
-        });
-    });
+    sortSystemList();
     
     if (editMode) {
         // leaveSettingsEditor();
         $('#sys_empty').css({'display':'block'});
+    } else {
+        loadSettingsEditor(undefined);
     }
 }
 
@@ -694,6 +681,8 @@ function readDirectory(err, files) {
             } 
         });
     });
+    
+    sortRomList();
 }
 
 function addSpaces(path) {
@@ -705,7 +694,28 @@ function addSpaces(path) {
         path = '"'+path+'"';
     }
     return path;
+}
 
+function sortRomList() {
+    $('.rom').sort(function(a, b) {
+      if (a.textContent < b.textContent) {
+        return -1;
+      } else {
+        return 1;
+      }
+    }).appendTo('#roms');
+    // console.log("Sorted ROM list.");
+}
+
+function sortSystemList() {
+    $('.system').sort(function(a, b) {
+      if (parseFloat($(a).data($(a).attr('id')).order) < parseFloat($(b).data($(b).attr('id')).order)) {
+        return -1;
+      } else {
+        return 1;
+      }
+    }).appendTo('#systems');
+    // console.log("Sorted system list.");
 }
 
 function filterRomList() {
@@ -717,20 +727,5 @@ function filterRomList() {
         } else {
             $(this).css({'display' : ''});
         }
-    });
-}
-
-function blurElement(element, size, time) {
-    var filterVal = 'blur(' + size + 'px)';
-    $(element).css({
-        'filter':filterVal,
-        'webkitFilter':filterVal,
-        'mozFilter':filterVal,
-        'oFilter':filterVal,
-        'msFilter':filterVal,
-        'transition':'all '+time+'s ease-out',
-        '-webkit-transition':'all '+time+'s ease-out',
-        '-moz-transition':'all '+time+'s ease-out',
-        '-o-transition':'all '+time+'s ease-out'
     });
 }
