@@ -6,6 +6,7 @@
 [Download version 1.1a (Win x64) here](https://github.com/ButcheredGenre/ROMLauncher/releases/tag/1.1a)
 
 NEW: ROM Launcher v.1.1a bugfix release
+
 NEW: ROM Launcher v.1.1 adds file/directory browsing functions
 
 ### Installation & Help
