@@ -18,4 +18,6 @@ I can't properly test ROM Launcher on other systems, so I won't *officially* rel
 
 ![ROM Launcher screenshot](/readme/romlauncher_screen_2.png)
 
+![ROM Launcher screenshot](/readme/romlauncher_screen_1.png)
+
 (...don't worry, you can adjust the colors if this is a bit too much for you.)
