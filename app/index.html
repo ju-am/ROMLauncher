@@ -69,7 +69,11 @@
                     <!--EMU EXE-->
                     <div class="settings_category" style="display:inline-block; margin-bottom:2px;">
                         <div class="settings_label">Emulator Executable Path</div>
-                        <input class="settings_emu_path settings_input">
+                        <div style="display: grid; grid-template-columns: 1fr 32px 32px;">
+                            <input class="settings_emu_path settings_input">
+                            <button class="settings_add_rem settings_input_make_relative" title="Make Path Relative">&#x21C4;</button>
+                            <button class="settings_add_rem settings_input_get_path" title="Search File">&#x1f4c4;</button>
+                        </div>
                     </div>
                     
                     <!--EMU ARGS-->
@@ -78,8 +82,11 @@
                         <!--INPUT CONTAINER : EMU ARGS LIST-->
                         <div style="display:grid; row-gap:2px;">
                             <!--INPUT CONTAINER : EMU ARG-->
-                            <div style="display: grid; grid-template-columns: 1fr 32px 32px;" >
+                            <div style="display: grid; grid-template-columns: 1fr 32px 32px 32px 32px 32px;" >
                                 <input class="settings_emu_arg settings_input">
+                                <button class="settings_add_rem settings_input_make_relative" title="Make Path Relative">&#x21C4;</button>
+                                <button class="settings_add_rem settings_input_get_directory" title="Search Directory">&#x1F4C1;</button>
+                                <button class="settings_add_rem settings_input_get_path" title="Search File">&#x1f4c4;</button>
                                 <button class="settings_add_rem settings_input_add">&#xFF0B;</button>
                                 <button class="settings_add_rem settings_input_rem">&#xFF0D;</button>
                             </div>
@@ -92,8 +99,10 @@
                         <!--INPUT CONTAINER : ROM DIR LIST-->
                         <div style="display:grid; row-gap:2px;">
                             <!--INPUT CONTAINER : ROM DIR-->
-                            <div style="display: grid; grid-template-columns: 1fr 32px 32px;" >
+                            <div style="display: grid; grid-template-columns: 1fr 32px 32px 32px 32px;" >
                                 <input class="settings_rom_dir settings_input">
+                                <button class="settings_add_rem settings_input_make_relative" title="Make Directory Relative">&#x21C4;</button>
+                                <button class="settings_add_rem settings_input_get_directory" title="Search Directory">&#x1F4C1;</button>
                                 <button class="settings_add_rem settings_input_add">&#xFF0B;</button>
                                 <button class="settings_add_rem settings_input_rem">&#xFF0D;</button>
                             </div>

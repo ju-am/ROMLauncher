@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, dialog, BrowserWindow } = require('electron');
 
 let win;
 

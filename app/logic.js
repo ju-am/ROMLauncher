@@ -229,6 +229,11 @@ function parseUserSettings(save) {
     } else {
         userSettingsId = settingsCurrentlyEditing;
     }
+    
+    if (!save && settingsCurrentlyEditing === 'New System' || settingsCurrentlyEditing === '') {
+        showEditorMessage('Cannot delete new system.', true);
+        return false;
+    }
 
     userSettings = new Object();
 
@@ -258,15 +263,15 @@ function parseUserSettings(save) {
 
     let settingsEmuPath = $('.settings_emu_path').val();
     
-    if (!settingsEmuPath.includes('"')) {
+    /*if (!settingsEmuPath.includes('"')) {
         showEditorMessage('Please wrap all paths in double quotation marks "..."', true);
         return false;
-    }/*
+    }
     else if (settingsEmuPath.includes('\\')) {
         showEditorMessage('Emulator path may not include backslashes.', true);
         return false;
     }*/
-    else if (settingsEmuPath === '') {
+    if (settingsEmuPath === '') {
         showEditorMessage('Emulator path may not be empty.', true);
         return false;
     }
@@ -385,8 +390,66 @@ const fs = require('fs');
 const path = require ('path');
 const app = require('electron');
 const remote = app.remote;
+const dialog = remote.dialog;
+
+// selectPath : select path (true) or directory (false)
+// title : window title
+// button : button label
+// callback : callback function
+function getPathDialog(jQueryElement, selectPath, title, button, callback) {
+    dialog.showOpenDialog({
+        title : title,
+        buttonLabel : button,
+        properties: [(selectPath ? 'openFile' : 'openDirectory')],
+        filters : [
+            { name : 'All Files', extensions : ['*'] }
+        ]
+    }, (file) => {
+        callback(file, jQueryElement);
+    });
+}
+
+$(document).on('click', '.settings_input_get_directory', function() {
+    
+    getPathDialog($(this), false, "Select Directory", "Select Directory", function(file, button) {
+        console.log(file);
+        if (file !== undefined) {
+            button.siblings('input').val(formatFilePath(file));
+        }
+    });
+});
+
+$(document).on('click', '.settings_input_get_path', function() {
+    
+    getPathDialog($(this), true, "Select File", "Select File", function(file, button) {
+        console.log(file);
+        if (file !== undefined) {
+            button.siblings('input').val(formatFilePath(file));
+        }
+    });
+});
+
+$(document).on('click', '.settings_input_make_relative', function() {
+    let filePath = $(this).siblings('input').val();
+    if (filePath !== '') {
+        console.log("Trying to make path relative...");
+        console.log(filePath);
+        console.log(exePath);
+        filePath = path.relative(exePath.toString().replace(/"/g, ''), filePath.toString().replace(/"/g, ''));
+        console.log(filePath);
+        $(this).siblings('input').val(addSpaces(filePath));
+    }
+});
+
+function formatFilePath(input) {
+    // input = input.toString().replace(/\\/g, '/');
+    // anchorPath = exePath.toString().replace(/\\/g, '/');
+    return addSpaces(input);
+}
+
 
 function loadSettingsEditor(systemOptions) {
+
     /*let exeDir = path.dirname(remote.app.getPath('exe'));
     let current = JSON.parse(fs.readFileSync(exeDir+'/../settings.json'));
     if (current) {
@@ -638,8 +701,7 @@ function addSpaces(path) {
     if (path.includes('\"')) {
         return path;
     }
-    
-    if (path.includes('')) {
+    else {
         path = '"'+path+'"';
     }
     return path;
