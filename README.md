@@ -3,8 +3,9 @@
 **ROM Launcher** is a minimal Electron desktop app to launch emulators with basic arguments (yes, *minimal* and *electron* in one sentence, I know). It's compatible with *pretty much* every emulator that supports command-line arguments. 
 
 ### Download
-[Download version 1.1 (Win x64) here](https://github.com/ButcheredGenre/ROMLauncher/releases/tag/1.1)
+[Download version 1.1a (Win x64) here](https://github.com/ButcheredGenre/ROMLauncher/releases/tag/1.1a)
 
+NEW: ROM Launcher v.1.1a bugfix release
 NEW: ROM Launcher v.1.1 adds file/directory browsing functions
 
 ### Installation & Help
