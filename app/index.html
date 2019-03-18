@@ -6,6 +6,7 @@
 		<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 		<script src="./jquery-3.3.1.min.js"></script>
 		<!--<script src="./jquery-ui.min.js"></script>-->
+        <script src="./upgradeSettings.js"></script>
 		<script src="./logic.js"></script>
 		<script>if (window.module) module = window.module;</script>
 		<link rel="stylesheet" type="text/css" href="theme.css"/>
@@ -99,10 +100,11 @@
                         <!--INPUT CONTAINER : ROM DIR LIST-->
                         <div style="display:grid; row-gap:2px;">
                             <!--INPUT CONTAINER : ROM DIR-->
-                            <div style="display: grid; grid-template-columns: 1fr 32px 32px 32px 32px;" >
+                            <div style="display: grid; grid-template-columns: 1fr 32px 32px 32px 32px 32px;" >
                                 <input class="settings_rom_dir settings_input">
                                 <button class="settings_add_rem settings_input_make_relative" title="Make Directory Relative">&#x21C4;</button>
                                 <button class="settings_add_rem settings_input_get_directory" title="Search Directory">&#x1F4C1;</button>
+                                <button class="settings_add_rem settings_input_directory_recursive" title="Half: Include Only This Folder (Default)">🌜</button>
                                 <button class="settings_add_rem settings_input_add">&#xFF0B;</button>
                                 <button class="settings_add_rem settings_input_rem">&#xFF0D;</button>
                             </div>

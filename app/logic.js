@@ -1,4 +1,9 @@
 $(document).ready(() => {
+    
+    // Upgrade settings file to latest version
+    upgradeSettings();
+    
+    // Load settings, systems, configuration editor
     initializeLauncher();
     
     $(".titlebar_control").mouseover(function() {
@@ -156,23 +161,25 @@ function saveDelCurrentSettings(save) {
         settingsFile = fs.readFileSync(exePath+'/../settings.json')
     }
     catch (e) {
-        console.log("FILE NOT FOUND -- settings.json IS MISSING")
+        console.log("save-del-settings : couldn't load settings.json!")
     }
     if (typeof settingsFile !== 'undefined') {
         // Found settings, store in settings var
-        console.log("LOADING EXISTING settings.json CONFIGURATION")
+        console.log("save-del-settings : load existing settings.json")
         settings = JSON.parse(settingsFile);
-        console.log("WRITING BACKUP TO settings_backup.json")
+        console.log("save-del-settings : write backup to settings_backup.json")
         try {
             fs.writeFileSync( exePath+'/../settings_backup.json', JSON.stringify(settings, null, 4), 'utf-8' );
         }
         catch (e) {
-            console.log("FAILED TO WRITE settings_backup.json FILE!")
+            console.log("save-del-settings : failed to write backup file!")
         }
     } else {
         // otherwise, create empty object in setting var
-        console.log("CREATING EMPTY settings.json CONFIGURATION")
+        console.log("save-del-settings : creating new empty configuration")
         settings = new Object();
+        settings.general = {};
+        settings.general.settingsVersion = currentSettingsVersion;
         settings.systems = [];
     }
     
@@ -311,6 +318,7 @@ function parseUserSettings(save) {
     let settingsRomDir = [];
     $('.settings_rom_dir').each(function() {
         let romDir = $(this).val();
+        let romDirRecursive = $(this).siblings('.settings_input_directory_recursive').text() === recursive_off ? false : true;
         
         if (!romDir.includes('"')) {
             returnWithError = 'Please wrap all directories in double quotation marks "..."';
@@ -327,7 +335,11 @@ function parseUserSettings(save) {
             return false;
         }
         
-        settingsRomDir[arrayIndex] = romDir;
+        let romDirOptions = new Object();
+        romDirOptions.directory = romDir;
+        romDirOptions.recursive = romDirRecursive;
+        
+        settingsRomDir[arrayIndex] = romDirOptions;
         arrayIndex++;
     });
     
@@ -429,6 +441,21 @@ $(document).on('click', '.settings_input_get_path', function() {
     });
 });
 
+const recursive_off = '🌜'; // emojis in code
+const recursive_off_title = "Half: Include Only This Folder (Default)";
+const recursive_on = '🌝'; // looks about right, let's hope this doesn't break
+const recursive_on_title = "Full: Include All Subdirectories";
+$(document).on('click', '.settings_input_directory_recursive', function() {
+    if ($(this).text() === recursive_off) {
+        $(this).text(recursive_on);
+        $(this).attr('title', recursive_on_title);
+    }
+    else {
+        $(this).text(recursive_off);
+        $(this).attr('title', recursive_off_title);
+    }
+});
+
 $(document).on('click', '.settings_input_make_relative', function() {
     let filePath = $(this).siblings('input').val();
     if (filePath !== '') {
@@ -447,47 +474,79 @@ function formatFilePath(input) {
     return addSpaces(input);
 }
 
-
+// Load settings from settings.json systems entry
 function loadSettingsEditor(systemOptions) {
-
-    /*let exeDir = path.dirname(remote.app.getPath('exe'));
-    let current = JSON.parse(fs.readFileSync(exeDir+'/../settings.json'));
-    if (current) {
-        console.log("Settings Editor: Settings file found, now loading...")
-        // if (current.hasOwnProperty('systems')) {
-    }*/
-
-    // I don't know why I wrote it like this, could probably access the classes directly (with .each(...) for the arrays), ...but whatever
-    $('.settings_category').each(function() {
-        $(this).find('.settings_currently_editing').val(systemOptions && systemOptions.hasOwnProperty('systemId') ? systemOptions.systemId : 'New System');
-        $(this).find('.settings_display_name').val(systemOptions && systemOptions.hasOwnProperty('tabName') ? systemOptions.tabName : '');
-        $(this).find('.settings_unique_id').val(systemOptions && systemOptions.hasOwnProperty('systemId') ? systemOptions.systemId : '');
-        $(this).find('.settings_emu_path').val(systemOptions && systemOptions.hasOwnProperty('emuPath') ? systemOptions.emuPath : '');
-        loadSettingsEditorArrayOption('.settings_emu_arg', systemOptions && systemOptions.hasOwnProperty('emuArgs') ? systemOptions.emuArgs : [], $(this));
-        loadSettingsEditorArrayOption('.settings_rom_dir', systemOptions && systemOptions.hasOwnProperty('romPaths') ? systemOptions.romPaths : [], $(this));
-        loadSettingsEditorArrayOption('.settings_file_type', systemOptions && systemOptions.hasOwnProperty('fileTypes') ? systemOptions.fileTypes : [], $(this));
-        $(this).find('.settings_css_gradient').val(systemOptions && systemOptions.hasOwnProperty('gradient') ? systemOptions.gradient : '');
-        $(this).find('.settings_order').val(systemOptions && systemOptions.hasOwnProperty('order') ? systemOptions.order : '0');
-    });
-
-}
-
-function loadSettingsEditorArrayOption(inputClass, jsonArray, settingsCategory) {
-    var settings_emu_arg_parent = settingsCategory.find(inputClass).parent().parent();
-    var settings_emu_arg = settingsCategory.find(inputClass).parent().first().clone();
-    settings_emu_arg.find('input').val('');
-    settingsCategory.find(inputClass).each(function() {
-        $(this).parent().remove();
-    });
-    for (var i = 0; i < jsonArray.length; ++i) {
-        let emu_arg_entry = settings_emu_arg.clone();
-        emu_arg_entry.find('input').val(jsonArray[i]);
-        settings_emu_arg_parent.append(emu_arg_entry.clone());
+    
+    let arrayIndex;
+    
+    let currentlyEditing = systemOptions && systemOptions.hasOwnProperty('systemId') ? systemOptions.systemId : 'New System';
+    $('.settings_currently_editing').val(currentlyEditing);
+    
+    let displayName = systemOptions && systemOptions.hasOwnProperty('tabName') ? systemOptions.tabName : '';
+    $('.settings_display_name').val(displayName);
+    
+    let uniqueId = systemOptions && systemOptions.hasOwnProperty('systemId') ? systemOptions.systemId : '';
+    $('.settings_unique_id').val(uniqueId);
+    
+    let emuPath = systemOptions && systemOptions.hasOwnProperty('emuPath') ? systemOptions.emuPath : '';
+    $('.settings_emu_path').val(emuPath);
+    
+    let emuArgs = systemOptions && systemOptions.hasOwnProperty('emuArgs') ? systemOptions.emuArgs : undefined;
+    if (emuArgs !== undefined) {
+        loadSettingsEditorEmptyInputRows('.settings_emu_arg', emuArgs.length);
+        arrayIndex = 0;
+        $('.settings_emu_arg').each(function() {
+            $(this).val(emuArgs[arrayIndex]);
+            arrayIndex++;
+        });
+    } else {
+        loadSettingsEditorEmptyInputRows('.settings_emu_arg', 1);
     }
-    if (jsonArray <= 0) settings_emu_arg_parent.append(settings_emu_arg.clone());
+    
+    let romPaths = systemOptions && systemOptions.hasOwnProperty('romPaths') ? systemOptions.romPaths : undefined;
+    if (romPaths !== undefined) {
+        loadSettingsEditorEmptyInputRows('.settings_rom_dir', romPaths.length);
+        arrayIndex = 0;
+        $('.settings_rom_dir').each(function() {
+            $(this).val(romPaths[arrayIndex].directory);
+            $(this).siblings('.settings_input_directory_recursive').text(romPaths[arrayIndex].recursive ? recursive_on : recursive_off);
+            $(this).siblings('.settings_input_directory_recursive').attr('title', romPaths[arrayIndex].recursive ? recursive_on_title : recursive_off_title);
+            arrayIndex++;
+        });
+    } else {
+        loadSettingsEditorEmptyInputRows('.settings_rom_dir', 1);
+    }
+    
+    let fileTypes = systemOptions && systemOptions.hasOwnProperty('fileTypes') ? systemOptions.fileTypes : undefined;
+    if (fileTypes !== undefined) {
+        loadSettingsEditorEmptyInputRows('.settings_file_type', fileTypes.length);
+        arrayIndex = 0;
+        $('.settings_file_type').each(function() {
+            $(this).val(fileTypes[arrayIndex]);
+            arrayIndex++;
+        });
+    } else {
+        loadSettingsEditorEmptyInputRows('.settings_file_type', 1);
+    }
+    
+    let gradient = systemOptions && systemOptions.hasOwnProperty('gradient') ? systemOptions.gradient : '';
+    $('.settings_css_gradient').val(gradient);
+    
+    let order = systemOptions && systemOptions.hasOwnProperty('order') ? systemOptions.order : '0';
+    $('.settings_order').val(order);
 }
 
-
+// Load empty input rows for certain array settings (rom directories, file types, etc.)
+function loadSettingsEditorEmptyInputRows(inputClass, inputRowCount) {
+    if (inputRowCount == 0) inputRowCount = 1;
+    let container = $(inputClass).parent().parent();
+    let inputLine = $(inputClass).parent().first().clone()
+    inputLine.find('input').val('');
+    container.html('');
+    for (let i = 0; i < inputRowCount; ++i) {
+        container.append(inputLine.clone());
+    }
+}
 
 $(document).on('click', '.e_add', function(){
     var input = $(this).parent().children('input').first().clone();
@@ -524,6 +583,8 @@ function changeSystem(systemOptions) {
         
         // Reload ROM list
         loadRomList(systemOptions);
+        // Sort ROM list
+        sortRomList();
         
         // Animate background color
         $('#background'+activeBackground).stop();
@@ -584,7 +645,7 @@ function initializeLauncher() {
         settingsFile = fs.readFileSync(exePath+'/../settings.json')
     }
     catch (e) {
-        console.log("FILE NOT FOUND settings.ini IS MISSING")
+        console.log("initialize-launcher : couldn't load settings.json!")
     }
     
     if (typeof settingsFile !== 'undefined') {
@@ -619,71 +680,92 @@ function initializeLauncher() {
 }
 
 function loadRomList(systemOptions) {
-    
-    // Wipe ROM display
+
+    // wipe ROM display
     $('#roms').html('');
 
     // sync read roms from rom-paths
-    for (const path of systemOptions.romPaths) {
-        romPath = path.replace(/\\/g, '/');
+    systemOptions.romPaths.forEach(function(pathOptions) {
+        
+        romPath = pathOptions.directory.replace(/\\/g, '/');
         romPath = romPath.replace(/"/g, '');
-        fs.readdir(romPath, readDirectory);
-    }
+        
+        try {
+            let files = readDirectory(romPath, systemOptions.fileTypes, pathOptions.recursive);
+            files.forEach(function(file) {
+                appendRomToList(systemOptions, file);
+            });
+        }
+        catch(e) {
+            console.log(e);
+            $('#roms').html('');
+            writeError("Failed to read ROM directory:");
+            writeError(romPath);
+            writeError("Please review your settings file.");
+        }
+
+    });
 }
 
 var romPath;
-function readDirectory(err, files) {
-    
-    // On failure
-    if (err) {
-        $('#roms').html('');
-        writeError("Failed to read ROM directory:");
-        writeError(romPath);
-        if (romPath.includes('\\')) {
-            writeError("Please use forward-slashes only.");
+
+function readDirectory(dir, fileTypes, recursive) {
+    var results = [];
+    var list = fs.readdirSync(dir);
+    list.forEach(function(file) {
+        file = dir + '/' + file;
+        var stat = fs.statSync(file);
+        if (stat && stat.isDirectory() && recursive) {
+            // recursion
+            results = results.concat(readDirectory(file, fileTypes, recursive));
         } else {
-            writeError("Please review your settings file.");
+            // filter current file, add to results if valid
+            let fileType = file.split(".").pop();
+            fileTypes.forEach(function(fileTypeFilter) {
+                if (fileType.toLowerCase() === fileTypeFilter.toLowerCase()) {
+                    results.push(file);
+                    return false;
+                }
+            });
         }
-        return;
+    });
+    console.log('read-directory : loaded ' + results.length + ' files to list');
+    return results;
+}
+
+function appendRomToList(systemOptions, file) {
+
+    var romInfo = new Object();
+
+    let fileType = file.split(".").pop();
+    let fileName = file.split(/(\\|\/)/g).pop().slice(0, -(fileType.length+1));
+    
+    romInfo.displayName = fileName;
+    romInfo.args = [];
+    
+    // add arguments to args array, replace ROM-file placeholder, add quotes where needed
+    romInfo.args.push(addSpaces(systemOptions.emuPath));
+    systemOptions.emuArgs.forEach(function(arg){
+        if (arg === '%ROMFILE%') {
+            arg = addSpaces(file);
+        }
+        romInfo.args.push(arg);
+    });
+    // if args is still empty, push only ROM-file
+    if (systemOptions.emuArgs.length === 0) {
+        romInfo.args.push(addSpaces(file));
     }
 
-    files.forEach(file => {
-        systemOptions.fileTypes.forEach(function(fileType) {
-            if (file.toLowerCase().includes('.'+fileType.toLowerCase())) {
-                
-                var romInfo = new Object();
-                
-                // remove file extension
-                romInfo.displayName = file.slice(0, -(fileType.length+1));
-                romInfo.args = [];
-                
-                // add arguments to args array, replace ROM-file placeholder, add quotes where needed
-                romInfo.args.push(addSpaces(systemOptions.emuPath));
-                systemOptions.emuArgs.forEach(function(arg){
-                    if (arg === '%ROMFILE%') {
-                        arg = addSpaces(romPath+'/'+file);
-                    }
-                    romInfo.args.push(arg);
-                });
-                // if args is still empty, push only ROM-file
-                if (systemOptions.emuArgs.length === 0) {
-                    romInfo.args.push(addSpaces(romPath+'/'+file));
-                }
+    // playlist styling
+    if (fileType === "m3u") {
+        romInfo.displayName = "&#8251; " + romInfo.displayName + " (Playlist)";
+    }
 
-                // playlist styling
-                if (fileType === "m3u") {
-                    romInfo.displayName = "&#8251; " + romInfo.displayName + " (Playlist)";
-                }
-
-                let entry = $('<tr class="rom"><td>'+romInfo.displayName+'</td></tr>');
-                entry.data('rom_info', romInfo);
-                $('#roms').append(entry);
-            } 
-        });
-    });
-    
-    sortRomList();
+    let entry = $('<tr class="rom"><td>'+romInfo.displayName+'</td></tr>');
+    entry.data('rom_info', romInfo);
+    $('#roms').append(entry);
 }
+
 
 function addSpaces(path) {
 
