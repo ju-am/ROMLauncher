@@ -151,12 +151,23 @@ function leaveSettingsEditor() {
 $(document).on('click', '.settings_input_add', function(){
     let parent = $(this).parent().clone();
     parent.find('input').val('');
+
+    // if this is the rom directory input, reset recursive option to default
+    if (parent.find('.settings_input_directory_recursive')) {
+        parent.find('.settings_input_directory_recursive').text(recursive_off);
+        parent.find('.settings_input_directory_recursive').attr('title', recursive_off_title);
+    }
+
     $(this).parent().parent().append(parent);
 });
 
 $(document).on('click', '.settings_input_rem', function(){
     if ($(this).parent().parent().find('input').length >= 2) {
         $(this).parent().remove();
+    }
+    // if this is the last input line, don't delete element, but value instead    
+    else {
+        $(this).parent().parent().find('input').val('');
     }
 });
 
@@ -274,14 +285,6 @@ function parseUserSettings(save) {
 
     let settingsEmuPath = $('.settings_emu_path').val();
     
-    /*if (!settingsEmuPath.includes('"')) {
-        showEditorMessage('Please wrap all paths in double quotation marks "..."', true);
-        return false;
-    }
-    else if (settingsEmuPath.includes('\\')) {
-        showEditorMessage('Emulator path may not include backslashes.', true);
-        return false;
-    }*/
     if (settingsEmuPath === '') {
         showEditorMessage('Emulator path may not be empty.', true);
         return false;
@@ -324,18 +327,13 @@ function parseUserSettings(save) {
         let romDir = $(this).val();
         let romDirRecursive = $(this).siblings('.settings_input_directory_recursive').text() === recursive_off ? false : true;
         
-        if (!romDir.includes('"')) {
-            returnWithError = 'Please wrap all directories in double quotation marks "..."';
-            console.log(returnWithError);
+        if (romDir === '') {
+            returnWithError = 'ROM directories may not be empty.';
             return false;
         }
-        /*
-        else if (romDir.includes('\\')) {
-            returnWithError = 'ROM directories may not include backslashes.';
-            return false;
-        }*/
-        else if (romDir === '') {
-            returnWithError = 'ROM directories may not be empty.';
+        else if (!romDir.includes('"')) {
+            returnWithError = 'Please wrap all directories in double quotation marks "..."';
+            console.log(returnWithError);
             return false;
         }
         
@@ -519,6 +517,10 @@ function loadSettingsEditor(systemOptions) {
         });
     } else {
         loadSettingsEditorEmptyInputRows('.settings_rom_dir', 1);
+        $('.settings_rom_dir').each(function() {
+            $(this).siblings('.settings_input_directory_recursive').text(recursive_off);
+            $(this).siblings('.settings_input_directory_recursive').attr('title', recursive_off_title);
+        });
     }
     
     let fileTypes = systemOptions && systemOptions.hasOwnProperty('fileTypes') ? systemOptions.fileTypes : undefined;
