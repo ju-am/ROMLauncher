@@ -91,6 +91,10 @@ $(document).on('click', '#settings_delete_system', function() {
     saveDelCurrentSettings(false);
 });
 
+$(document).on('click', '.settings_css_gradient_preset', function() {
+    $(this).parent().siblings('input').val($(this).attr('style').replace('background: ', '').replace(';', ''));
+});
+
 $(document).on('click', '#titlebar_close', function(){
     var window = remote.getCurrentWindow();
     window.close();

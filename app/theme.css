@@ -360,6 +360,15 @@ html, body {
     text-align: center;
 }
 
+.settings_css_gradient_preset {
+    height: 26px;
+}
+
+.settings_css_gradient_preset:hover {
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
 #roms_wrapper {
 	grid-template-columns: 100%;
 	grid-auto-rows: minmax(1px, 1fr) 42px;
