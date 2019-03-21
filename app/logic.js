@@ -28,7 +28,25 @@ function launchEmulator(romInfo) {
     // args
     // cwd
     
-    let spawnEmulator = path.resolve(romInfo.emulator.replace(/"/g, ''));
+    let spawnEmulator = '';
+    
+    let addedEmulator = false;
+    try {
+        let stat = fs.statSync(romInfo.emulator.replace(/"/g, ''));
+        if (stat.isFile()) {
+            console.log('launch-emulator : resolved emulator path...');
+            spawnEmulator = path.resolve(romInfo.emulator.replace(/"/g, ''));
+            addedEmulator = true;
+        }
+    } catch(e) {
+        // errors here are expected whenever a non-path emulator command is given
+    }
+    if (!addedEmulator) {
+        console.log('launch-emulator : failed to resolve emulator path, add as command instead...');
+        spawnEmulator = romInfo.emulator.replace(/"/g, '');
+    }
+    console.log('launch-emulator : emulator path ' + spawnEmulator);
+    
     let spawnArgs = [];
     
     for (var i = 0; i < romInfo.args.length; ++i) {
@@ -38,11 +56,13 @@ function launchEmulator(romInfo) {
             if (stat.isFile()) {
                 console.log('launch-emulator : convert emulator argument file path...');
                 spawnArgs.push(path.resolve(romInfo.args[i].replace(/"/g, '')));
+                console.log('launch-emulator : converted to ' + spawnArgs[i]);
                 added = true;
             }
             if (stat.isDirectory()) {
                 console.log('launch-emulator : convert emulator argument directory...');
                 spawnArgs.push(path.resolve(romInfo.args[i].replace(/"/g, '')));
+                console.log('launch-emulator : converted to ' + spawnArgs[i]);
                 added = true;
             }
         }
@@ -54,17 +74,17 @@ function launchEmulator(romInfo) {
         }
     }
     
-    console.log(romInfo.cwd);
+    console.log('launch-emulator : try running ' + spawnEmulator + ' ' + spawnArgs.join());
 
     displayLoadingScreen();
-
     emulator = spawn(spawnEmulator, spawnArgs);
     emulator.on('error', onEmulatorError);
 }
 
-function onEmulatorError() {
+function onEmulatorError(err) {
     showRomListError("Failed to launch emulator. Please review your settings.");
     $('#foreground0').css({'display':'none'});
+    console.log('on-emulator-error : ' + err);
 }
 
 function killEmulator() {

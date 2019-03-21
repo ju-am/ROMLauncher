@@ -112,19 +112,9 @@ https://www.7-zip.org/
 LINUX VERSION-------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-This is the Windows release of 'ROM Launcher'.
-In order to run ROM Launcher on Linux, download or build the Linux binaries 
-of 'electron' and copy the contents of the /resources/ folder of this
-release to the /resources/ folder of the Linux release of electron.
-
-Please keep in mind that ROM Launcher uses the parent directory of the
-electron executable as its working directory. That same directory should contain
-the /icons/ folder, otherwise ROM Launcher won't be able to find them (the
-parent directory will also contain the settings.json file).
-
-Please also keep in mind that I didn't do any extensive testing of ROM
-Launcher on Linux -- while mGBA launched fine in my Linux Mint VM, other
-things may be broken.
+Text-rendering of certain unicode characters will be different in the Linux
+release. Please note that I do most of my testing with the Windows version of
+the launcher. Whatever testing I do for the Linux release, I do with Linux Mint.
 
 --------------------------------------------------------------------------------
 KNOWN ISSUES--------------------------------------------------------------------
