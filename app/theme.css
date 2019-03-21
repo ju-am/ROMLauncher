@@ -13,6 +13,11 @@
   src: url(./Roboto-Black.ttf);
 }
 
+@font-face {
+  font-family: notojp-reg;
+  src: url(./NotoSansJP-Regular.otf);
+}
+
 *, *::after, *::before {
 	-webkit-user-select: none;
 }
@@ -113,6 +118,7 @@ html, body {
 #titlebar_close {
     right: 0;
     top: 0;
+    font-family: notojp-reg;
 }
 
 #titlebar_close:hover {
@@ -123,11 +129,13 @@ html, body {
 #titlebar_max {
     right: 48px;
     top: 0;
+    font-family: notojp-reg;
 }
 
 #titlebar_min {
     right: 96px;
     top: 0;
+    font-family: notojp-reg;
 }
 
 #titlebar_settings {

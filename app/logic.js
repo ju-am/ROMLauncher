@@ -963,10 +963,10 @@ function appendRomToList(systemOptions, file) {
 
 function addSpaces(path) {
 
-    if (path.charAt(0) !== '"') {
+    if (path.toString().charAt(0) !== '"') {
         path = '"'+path;
     }
-    if (path.charAt(path.length-1) !== '"') {
+    if (path.toString().charAt(path.length-1) !== '"') {
         path = path+'"';
     }
     return path;
