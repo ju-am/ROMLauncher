@@ -243,12 +243,35 @@ html, body {
     border: 1px solid white;
 }
 
+.system:focus {
+    outline: none;
+}
+
 .system_icon {
 	image-rendering: crisp-edges;
 	width: 32px;
 	height:32px;
 	/*image-rendering: pixelated;*/
 	filter: drop-shadow(0 4px 0 rgb(0, 0, 0, 0.1));
+}
+
+.settings_tab {
+    height: 36px;
+    line-height: 36px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.2);
+    font-size: 13px;
+    /*border-top-right-radius: 16px;
+    border-top-left-radius: 16px;*/
+}
+
+.settings_tab_blur {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.settings_tab_blur:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+    cursor: pointer;
 }
 
 #settings_wrapper {
@@ -273,6 +296,10 @@ html, body {
 }
 
 #settings_editor {
+    margin-right: 2px;
+}
+
+#general_editor {
     margin-right: 2px;
 }
 
@@ -306,6 +333,10 @@ html, body {
     background-color: rgba(0, 0, 0, 0.4);
 }
 
+#settings_delete_system:hover {
+    background-color: #CF3434 !important;
+}
+
 .settings_up_down {
     display: inline-block;
     height: 32px;
@@ -319,12 +350,13 @@ html, body {
     font-size: 16px;
     background-color: rgba(0, 0, 0, 0.2);
     color: white;
-    border: none;
+    border: 2px solid transparent;
     cursor: pointer;
-}
-
-#settings_delete_system:hover {
-    background-color: #CF3434 !important;
+    box-sizing: border-box;
+    height: 28px;
+    line-height: 26px;
+    width: 28px;
+    padding: 0;
 }
 
 .settings_add_rem:hover {
@@ -332,6 +364,7 @@ html, body {
 }
 
 .settings_add_rem:focus {
+    border: 2px solid rgba(0, 0, 0, 0.2);
     outline: none;
 }
 
@@ -352,6 +385,28 @@ html, body {
     box-sizing: border-box;
     width: 100%;
     padding: 6px;
+    outline: none;
+    height: 28px;
+}
+
+.settings_checkbox {
+    font-size: 16px;
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    height: 28px;
+    width: 28px;
+    line-height: 24px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+.settings_checkbox:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.settings_checkbox:focus {
     outline: none;
 }
 
@@ -374,6 +429,38 @@ html, body {
 	grid-auto-rows: minmax(1px, 1fr) 42px;
 	max-height: 100%;
 	overflow: hidden;
+}
+
+#roms_error_message {
+    padding: 18px 44px 18px 18px;
+    font-size: 13px;
+    position: relative;
+    background-color: #CF3434;
+    margin-bottom: 2px;
+    box-sizing: border-box;
+    min-height: 36px;
+    border: 4px solid rgba(0, 0, 0, 0.2);
+    -webkit-app-region: no-drag;
+    display: none;
+    white-space: pre-line;
+}
+
+#roms_error_message_close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    outline: none;
+    border: none;
+    color: white;
+    font-size: 9px;
+    width: 32px;
+    height: 32px;
+}
+
+#roms_error_message_close:hover {
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 #roms_container {
@@ -441,12 +528,17 @@ html, body {
     border: 1px solid transparent;
 	background: linear-gradient(315deg, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.2) 100%);
     line-height: 32px;
+    box-sizing: border-box;
 }
 
 .rom > td:hover {
     cursor: pointer;
     border: 1px solid white;
     background: rgba(0,0,0,0.4);
+}
+
+.rom:focus {
+    outline: none;
 }
 
 #search_area {
@@ -535,4 +627,14 @@ html, body {
     border: 8px solid rgba(0, 0, 0, 0.4);
     border-top-color: rgba(0, 0, 0, 0.8);
     animation: spinner 0.7s linear infinite;
+}
+
+a {
+    color: #97CEFF;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #97CEFF;
+    text-decoration: none;
 }

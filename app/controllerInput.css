@@ -1,0 +1,10 @@
+.system:focus {
+    outline: none;
+    border: 1px solid white;
+    background: rgba(0,0,0,0.4);
+}
+
+.rom:focus > td {
+    border: 1px solid white;
+    background: rgba(0,0,0,0.4);
+}

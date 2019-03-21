@@ -10,7 +10,7 @@ function createWindow() {
         frame: false,
         webPreferences: {
             // experimentalFeatures: true,
-            // nodeIntegration: false
+            nodeIntegration: true
         }
     });
     win.loadFile('./index.html');
@@ -30,6 +30,14 @@ function createWindow() {
         win.webContents.executeJavaScript('$("#titlebar").css({"margin" : "4px", "padding" : "0 0 0 12px"})');
         win.webContents.executeJavaScript('$("#wrapper").css({"left" : "4px", "right" : "4px", "bottom" : "4px"})');
         win.webContents.executeJavaScript('$("#wrapper_settings").css({"left" : "4px", "right" : "4px", "bottom" : "4px"})');
+    });
+    
+    win.on('blur', function(){
+        win.webContents.executeJavaScript('controllerInputBlurred();');
+    });
+
+    win.on('focus', function(){
+        win.webContents.executeJavaScript('controllerInputFocused();');
     });
 }
 

@@ -1,24 +1,15 @@
 --------------------------------------------------------------------------------
-ROM Launcher--------------------------------------------------------------------
+ButcheredGenre ROM Launcher-----------------------------------------------------
 https://github.com/ButcheredGenre/ROMLauncher-----------------------------------
 --------------------------------------------------------------------------------
 
-TOC
->---CHANGELOG
->---SETUP
->---INITIAL CONFIGURATION
->---(SLIGHTLY) ADVANCED CONFIGURATION
->---IN CASE OF ERROR
->---MISSING OR INCORRECT IMAGES
->---LINUX VERSION
->---KNOWN ISSUES
->---CONTACT / TROUBLESHOOTING
-
---------------------------------------------------------------------------------
-CHANGELOG-----------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-    https://github.com/ButcheredGenre/ROMLauncher
+SETUP
+CONFIGURATION
+IN CASE OF ERROR
+MISSING OR INCORRECT IMAGES
+LINUX VERSION
+KNOWN ISSUES
+CONTACT / TROUBLESHOOTING
 
 --------------------------------------------------------------------------------
 SETUP---------------------------------------------------------------------------
@@ -27,10 +18,10 @@ SETUP---------------------------------------------------------------------------
 Place this folder anywhere you like. If you want to use relative paths, you
 should place this folder near your emulators. The ROM Launcher executable is in
 the /bin/ folder (launcher.exe). A settings file (if not already created) will
-be created in this (the executable's parent) directory.
+be created in the executable's parent directory.
 
 --------------------------------------------------------------------------------
-INITIAL CONFIGURATION-----------------------------------------------------------
+CONFIGURATION-------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 On first start, you'll see an empty launcher. Press the EDIT button (top right)
@@ -58,7 +49,9 @@ unless you want to launch e.g. retroarch with a specific core.
 >---[ROM Directories] : One or more directories containing ROMs for this system.
 You can use the 'Search Directory' button to search for directories, then use
 the 'Make Relative' button to convert the paths to relative paths, if possible
-(this is optional).
+(this is optional). Click on the moon icon next to the directory to toggle
+between a flat (include only the specified directory) or deep (include this,
+as well as all of this folder's subdirectories) search for this directory.
 
 >---[ROM File Types] : File-types of ROMs. Add without punctuation.
 
@@ -69,7 +62,8 @@ linear-gradient(0deg, rgba(0,164,113,1) 0%, rgba(0,129,156,1) 100%)
     
 ...there are plenty of websites that can generate a CSS gradient for you. Make
 sure to enter only the value, without the 'background:'-part, or final
-semicolon. Enter nothing for a default gradient.
+semicolon. Enter nothing for a default gradient, or pick from one of the presets
+below the input field.
 
 >---[Order] : List order of the system relative to other systems. This isn't the
 most elegant solution to sorting things, but it ... kind of works, so there you
@@ -82,13 +76,9 @@ If things do not load as expected even though you've entered everything
 correctly, try restarting the ROM Launcher. If everything fails, try restoring
 a previous configuration from the settings_backup.json file.
 
---------------------------------------------------------------------------------
-(SLIGHTLY) ADVANCED CONFIGURATION-----------------------------------------------
---------------------------------------------------------------------------------
-
-If you feel like it, you can edit the settings.json directly. This makes it
+(If you feel like it, you can edit the settings.json directly. This makes it
 easier to e.g. find & replace strings, if needed. Overall, this is not
-recommended.
+recommended, as a single wrong character will break the configuration.)
 
 --------------------------------------------------------------------------------
 IN CASE OF ERROR----------------------------------------------------------------
@@ -158,5 +148,6 @@ CONTACT / TROUBLESHOOTING-------------------------------------------------------
 If - after some time - you're unable to resolve an issue -- or if you have a
 feature request, feel free to contact me on reddit (/u/TLOZ).
 Please check out the KNOWN ISSUES first. I can't guarantee a fast response.
+You can also open up issues on the GitHub page.
 
 --------------------------------------------------------------------------------

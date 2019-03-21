@@ -20,23 +20,80 @@ $(document).ready(() => {
 });
 
 
-var childProcess = require('child_process');
+var spawn = require('child_process').spawn;
+var emulator;
 
-function launchEmulator(args) {
-    console.log(args);
+function launchEmulator(romInfo) {
+    // emulator
+    // args
+    // cwd
+    
+    let spawnEmulator = path.resolve(romInfo.emulator.replace(/"/g, ''));
+    let spawnArgs = [];
+    
+    for (var i = 0; i < romInfo.args.length; ++i) {
+        let added = false;
+        try {
+            let stat = fs.statSync(romInfo.args[i].replace(/"/g, ''));
+            if (stat.isFile()) {
+                console.log('launch-emulator : convert emulator argument file path...');
+                spawnArgs.push(path.resolve(romInfo.args[i].replace(/"/g, '')));
+                added = true;
+            }
+            if (stat.isDirectory()) {
+                console.log('launch-emulator : convert emulator argument directory...');
+                spawnArgs.push(path.resolve(romInfo.args[i].replace(/"/g, '')));
+                added = true;
+            }
+        }
+        catch(e) {
+            // errors here are expected whenever a non-path/directory argument is given, just ignore it
+        }
+        if (!added) {
+            spawnArgs.push(romInfo.args[i]);
+        }
+    }
+    
+    console.log(romInfo.cwd);
 
     displayLoadingScreen();
 
-    var emulator = childProcess.exec(args.join(' '), (error, stdout, stderr) => {
-        // console.log(emulator.pid);
-        if (error) {
-            console.log(error.message);
-            $('#roms').html("");
-            writeError("Failed to launch emulator.");
-            writeError("Please review your settings.");
-            $('#foreground0').css({'display':'none'});
-        }
+    emulator = spawn(spawnEmulator, spawnArgs);
+    emulator.on('error', onEmulatorError);
+}
+
+function onEmulatorError() {
+    showRomListError("Failed to launch emulator. Please review your settings.");
+    $('#foreground0').css({'display':'none'});
+}
+
+function killEmulator() {
+    if (emulator) {
+        emulator.kill();
+    }
+}
+
+function showRomListError(message) {
+    $('#roms_wrapper').css({
+        'grid-auto-rows' : 'min-content minmax(1px, 1fr) 42px'
     });
+    $('#roms_error_message').css({
+        'display' : 'block'
+    })
+    $('#roms_error_message').get(0).childNodes[0].nodeValue = message;
+}
+
+$(document).on('click', '#roms_error_message_close', function() {
+    hideRomListError();
+});
+
+function hideRomListError() {
+    $('#roms_wrapper').css({
+        'grid-auto-rows' : 'minmax(1px, 1fr) 42px'
+    });
+    $('#roms_error_message').css({
+        'display' : 'none'
+    })
 }
 
 function displayLoadingScreen() {
@@ -56,16 +113,22 @@ function writeError(message) {
 }
 
 $(document).on('click', '.rom', function(){
+    launchEmulatorFromRomList($(this));
+});
+
+function onGamepadConfirmOverRom(element) {
+    launchEmulatorFromRomList(element);
+}
+
+function launchEmulatorFromRomList(element) {
     let fadeMin = 0.75;
     let fadeMax = 1.0;
     let fadeFreq = 100;
-    $(this).stop();
-    $(this).fadeTo(fadeFreq, fadeMin).fadeTo(fadeFreq, fadeMax).fadeTo(fadeFreq, fadeMin).fadeTo(fadeFreq, fadeMax);
-
-    let romInfo = $(this).data('rom_info');
-
-    launchEmulator(romInfo.args);
-});
+    element.stop();
+    element.fadeTo(fadeFreq, fadeMin).fadeTo(fadeFreq, fadeMax).fadeTo(fadeFreq, fadeMin).fadeTo(fadeFreq, fadeMax);
+    let romInfo = element.data('rom_info');
+    launchEmulator(romInfo);
+}
 
 $(document).on('click', '#settings_editor_message_close', function() {
     $('#settings_editor_message').css({'display' : 'none'});
@@ -95,6 +158,36 @@ $(document).on('click', '.settings_css_gradient_preset', function() {
     $(this).parent().siblings('input').val($(this).attr('style').replace('background: ', '').replace(';', ''));
 });
 
+$(document).on('click', '#display_system_settings', function() {
+    if ($(this).hasClass('settings_tab_blur')) {
+        $('#display_general_settings').addClass('settings_tab_blur');
+        $(this).removeClass('settings_tab_blur');
+        
+        $('#general_editor').css({'display' : 'none'});
+        $('#settings_editor').css({'display' : 'block'});
+        
+        let editorMessage = $('#settings_editor_message');
+        editorMessage.css({'display' : 'none'});
+        editorMessage.detach();
+        $('#settings_system_save_options').before(editorMessage);
+    }
+});
+
+$(document).on('click', '#display_general_settings', function() {
+    if ($(this).hasClass('settings_tab_blur')) {
+        $('#display_system_settings').addClass('settings_tab_blur');
+        $(this).removeClass('settings_tab_blur');
+        
+        $('#general_editor').css({'display' : 'block'});
+        $('#settings_editor').css({'display' : 'none'});
+        
+        let editorMessage = $('#settings_editor_message');
+        editorMessage.css({'display' : 'none'});
+        editorMessage.detach();
+        $('#settings_general_save_options').before(editorMessage);
+    }
+});
+
 $(document).on('click', '#titlebar_close', function(){
     var window = remote.getCurrentWindow();
     window.close();
@@ -112,6 +205,16 @@ $(document).on('click', '#titlebar_max', function(){
 $(document).on('click', '#titlebar_min', function(){
     var window = remote.getCurrentWindow();
     window.minimize(); 
+});
+
+
+$(document).on('click', '.settings_checkbox', function() {
+    if ($(this).text() === '') {
+        $(this).text('✓');
+    }
+    else {
+        $(this).text('');
+    }
 });
 
 var editMode = false;
@@ -224,15 +327,13 @@ function saveDelCurrentSettings(save) {
         fs.writeFileSync( exePath+'/../settings.json', JSON.stringify(settings, null, 4), 'utf-8' );
     }
     catch(e) {
-        console.log("FAILED TO WRITE settings.json FILE!")
+        console.log("save-del-settings : failed to write to settings.json")
     }
 
     showEditorMessage('Changes saved! You might need to restart the launcher for the changes to take effect.', false);
     
     if (!save) {
-        $('.settings_category').each(function() {
-            $(this).find('.settings_currently_editing').val('New System');
-        });
+        $('.settings_currently_editing').val('New System');
     }
     
     initializeLauncher();
@@ -398,6 +499,91 @@ function parseUserSettings(save) {
     userSettings.order = settingsOrder;
     
     return true;
+}
+
+$(document).on('click', '#settings_save_general', function() {
+    saveGeneralSettings();
+});
+
+function saveGeneralSettings() {
+    try {
+        settingsFile = fs.readFileSync(exePath+'/../settings.json')
+    }
+    catch (e) {
+        console.log("save-general-settings : couldn't load settings.json!")
+    }
+    if (typeof settingsFile !== 'undefined') {
+        // Found settings, store in settings var
+        console.log("save-general-settings : load existing settings.json")
+        settings = JSON.parse(settingsFile);
+        console.log("save-general-settings : write backup to settings_backup.json")
+        try {
+            fs.writeFileSync( exePath+'/../settings_backup.json', JSON.stringify(settings, null, 4), 'utf-8' );
+        }
+        catch (e) {
+            console.log("save-general-settings : failed to write backup file!")
+        }
+    } else {
+        // otherwise, create empty object in setting var
+        console.log("save-general-settings : creating new empty configuration")
+        settings = new Object();
+        settings.general = {};
+        settings.general.settingsVersion = currentSettingsVersion;
+        settings.systems = [];
+    }
+    
+    // Parse general options here
+    
+    if ($('.settings_controller_enabled').text() !== '') {
+        settings.general.controllerEnabled = true;
+    } else {
+        settings.general.controllerEnabled = false;
+    }
+    
+    if ($('.settings_controller_forcequit').text() !== '') {
+        settings.general.controllerForceQuit = true;
+    } else {
+        settings.general.controllerForceQuit = false;
+    }
+    
+
+    // Write system changes to disk
+    try {
+        fs.writeFileSync( exePath+'/../settings.json', JSON.stringify(settings, null, 4), 'utf-8' );
+    }
+    catch(e) {
+        console.log("save-general-settings : failed to write to settings.json")
+    }
+
+    showEditorMessage('Changes saved! Restart the launcher for the changes to take effect.', false);
+}
+
+function loadGeneralSettings() {
+    try {
+        settingsFile = fs.readFileSync(exePath+'/../settings.json')
+    }
+    catch (e) {
+        console.log("load-general-settings : couldn't load settings.json!")
+        return;
+    }
+    if (typeof settingsFile !== 'undefined') {
+        // Found settings, store in settings var
+        console.log("load-general-settings : load existing settings.json")
+        settings = JSON.parse(settingsFile);
+    }
+    
+    if (settings.hasOwnProperty('general')) {
+        if (settings.general.hasOwnProperty('controllerEnabled')) {
+            $('.settings_controller_enabled').text(settings.general.controllerEnabled ? '✓' : '');
+            // Enable controller input
+            controllerInputEnabled = settings.general.controllerEnabled;
+        }
+        if (settings.general.hasOwnProperty('controllerForceQuit')) {
+            $('.settings_controller_forcequit').text(settings.general.controllerForceQuit ? '✓' : '');
+            // Enable controller force quit
+            controllerForceQuit = settings.general.controllerForceQuit;
+        }
+    }
 }
 
 const fs = require('fs');
@@ -567,14 +753,15 @@ $(document).on('click', '.e_rem', function(){
 });
 
 $(document).on('click', '.system', function() {
-    
-    systemOptions = $(this).data($(this).attr('id'));
+    changeSystemFromSystemsList($(this));
+});
+
+function changeSystemFromSystemsList(element) {
+    systemOptions = element.data(element.attr('id'));
     changeSystem(systemOptions);
-    
-    // if (editMode)
     loadSettingsEditor(systemOptions);
     $('#settings_editor_message').css({'display' : 'none'});
-});
+}
 
 $(document).on('click', '#sys_empty', function() {
     loadSettingsEditor(undefined);
@@ -668,7 +855,7 @@ function initializeLauncher() {
             
             // console.log(iconPath);
             
-            $('#systems').append('<div id="system_'+systemOptions.systemId+'" class="system"><img class="system_icon" src="'+iconPath+'" /></div>');
+            $('#systems').append('<div id="system_'+systemOptions.systemId+'" class="system" tabindex="1"><img class="system_icon" src="'+iconPath+'" /></div>');
             $('#system_'+systemOptions.systemId).data('system_'+systemOptions.systemId, systemOptions);
         });
     }
@@ -682,6 +869,7 @@ function initializeLauncher() {
         $('#sys_empty').css({'display':'block'});
     } else {
         loadSettingsEditor(undefined);
+        loadGeneralSettings();
     }
 }
 
@@ -704,10 +892,7 @@ function loadRomList(systemOptions) {
         }
         catch(e) {
             console.log(e);
-            $('#roms').html('');
-            writeError("Failed to read ROM directory:");
-            writeError(romPath);
-            writeError("Please review your settings file.");
+            showRomListError("Failed to read ROM directory:\n" + romPath + "\nPlease review your settings file.")
         }
 
     });
@@ -741,16 +926,18 @@ function readDirectory(dir, fileTypes, recursive) {
 
 function appendRomToList(systemOptions, file) {
 
-    var romInfo = new Object();
-
+    // file type without punctuation
     let fileType = file.split(".").pop();
-    let fileName = file.split(/(\\|\/)/g).pop().slice(0, -(fileType.length+1));
-    
+    // file name with extension
+    let fullFileName = file.split(/(\\|\/)/g).pop();
+    // file name without extension
+    let fileName = fullFileName.slice(0, -(fileType.length+1));
+
+    var romInfo = new Object();    
     romInfo.displayName = fileName;
+    romInfo.emulator = addSpaces(systemOptions.emuPath);
+    romInfo.cwd = addSpaces(systemOptions.emuPath.replace(systemOptions.emuPath.split(/(\\|\/)/g).pop(), ''));
     romInfo.args = [];
-    
-    // add arguments to args array, replace ROM-file placeholder, add quotes where needed
-    romInfo.args.push(addSpaces(systemOptions.emuPath));
     systemOptions.emuArgs.forEach(function(arg){
         if (arg === '%ROMFILE%') {
             arg = addSpaces(file);
@@ -764,10 +951,11 @@ function appendRomToList(systemOptions, file) {
 
     // playlist styling
     if (fileType === "m3u") {
-        romInfo.displayName = "&#8251; " + romInfo.displayName + " (Playlist)";
+        // romInfo.displayName = "&#8251; " + romInfo.displayName + " (Playlist)";
+        romInfo.displayName = romInfo.displayName + " (Playlist)";
     }
 
-    let entry = $('<tr class="rom"><td>'+romInfo.displayName+'</td></tr>');
+    let entry = $('<tr class="rom" tabindex="1"><td>'+romInfo.displayName+'</td></tr>');
     entry.data('rom_info', romInfo);
     $('#roms').append(entry);
 }
@@ -775,11 +963,11 @@ function appendRomToList(systemOptions, file) {
 
 function addSpaces(path) {
 
-    if (path.includes('\"')) {
-        return path;
+    if (path.charAt(0) !== '"') {
+        path = '"'+path;
     }
-    else {
-        path = '"'+path+'"';
+    if (path.charAt(path.length-1) !== '"') {
+        path = path+'"';
     }
     return path;
 }
@@ -817,3 +1005,10 @@ function filterRomList() {
         }
     });
 }
+
+var shell = require('electron').shell;
+
+$(document).on('click', 'a[href^="http"]', function(event) {
+    event.preventDefault();
+    shell.openExternal(this.href);
+});

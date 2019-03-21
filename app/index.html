@@ -8,8 +8,10 @@
 		<!--<script src="./jquery-ui.min.js"></script>-->
         <script src="./upgradeSettings.js"></script>
 		<script src="./logic.js"></script>
+        <script src="./controllerInput.js"></script>
 		<script>if (window.module) module = window.module;</script>
-		<link rel="stylesheet" type="text/css" href="theme.css"/>
+		<link rel="stylesheet" type="text/css" href="./theme.css"/>
+        <link rel="stylesheet" type="text/css" href="./controllerInput.css" disabled>
 	</head>
 	<body>
     <div id="background0" class="background"></div>
@@ -25,14 +27,21 @@
         </div>
 		<div id="wrapper" class="content_wrapper">
 			<div id="systems">
-				<!--<div class="system"></div>-->
+				<!--system elements-->
 			</div>
 			<div id="roms_wrapper" style="display:grid">
+            
+                <div id="roms_error_message">
+                    DEBUG_MESSAGE
+                    <button id="roms_error_message_close">&#x2573;</button>
+                </div>
+                
 				<div id="roms_container">
                     <div id="roms">
-                        <!--<div class="rom">ROM NAME</div>-->
+                        <!--ROM elements-->
                     </div>
 				</div>
+                
 				<div id="search_area">
 					<!--<div id="search_bar_wrapper">-->
                     <input id="search_bar" type="text" placeholder="Search..." oninput="filterRomList()">
@@ -40,7 +49,83 @@
 					<!--</div>-->
 				</div>
 			</div>
-            <div id="settings_wrapper" style="display:none">
+            <div id="settings_wrapper" style="display:none; grid-template-rows: max-content 1fr;">
+                
+                <!--SETTINGS CATEGORY TABS-->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; margin-right: 2px;">
+                    <div id="display_system_settings" class="settings_tab">System</div>
+                    <div id="display_general_settings" class="settings_tab settings_tab_blur">General</div>
+                </div>
+            
+                <!--GENERAL SETTINGS-->
+                <div id="general_editor" style="display: none;">
+                
+                    <div class="settings_category" style="display:inline-block; margin-bottom:2px;">
+                        <div style="display: grid; grid-template-columns: 1fr; margin-top: 2px;">
+                            <div class="settings_label">
+                                ROM Launcher Version 1.2
+                                <br>
+                                <span style="opacity: 0.6">
+                                By ButcheredGenre / TLOZ
+                                </span>
+                                
+                                <br><br>
+                                If you've gotten some use out of this launcher and happen to have some money to throw away -- then why not throw it at me? Donations are never required, but I greatly appreciate any contributions &#x1F31D;
+                                <br><br>
+                                
+                                <span style="text-shadow: none;">
+                                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VMCQPMW8N47L4&source=url">PayPal Donation Link (opens in your browser)</a>
+                                </span>
+                                <br><br>
+                                
+                                <span style="opacity: 0.6">
+                                You can change some general and experimental settings below. You'll have to restart the launcher for any of these settings to take effect.
+                                </span>
+                                
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="settings_category" style="display:inline-block; margin-bottom:2px;">
+                        <div style="display: grid; grid-template-columns: 1fr 28px; margin-top: 2px;">
+                            <div class="settings_label">
+                                Enable Controller Input (Experimental)
+                                <br><br>
+                                <span style="opacity: 0.6">
+                                Navigate the interface using the D-Pad. Load a system or launch a game by pressing the 'A' button. You may need to click on an element before controller input starts working. Only XInput (Xbox) controllers are officially supported.
+                                <br><br>
+                                Please send me feedback on experimental features, if you have any.
+                                </span>
+                            </div>
+                            <button class="settings_checkbox settings_controller_enabled"></button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings_category" style="display:inline-block; margin-bottom:2px;">
+                        <div style="display: grid; grid-template-columns: 1fr 28px; margin-top: 2px;">
+                            <div class="settings_label">
+                                Force Quit Emulator Using L3+R3 (Experimental)
+                                <br><br>
+                                <span style="opacity: 0.6">
+                                Quit the launched emulator using a controller's L3 and R3 buttons (pressing in both analog sticks at the same time). Requires controller input to be enabled.
+                                <br><br>
+                                Please send me feedback on experimental features, if you have any.
+                                </span>
+                            </div>
+                            <button class="settings_checkbox settings_controller_forcequit"></button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings_category" id="settings_general_save_options">
+                        <div style="display: grid; grid-template-columns: 30% 70%; column-gap: 2px;" >
+                            <div></div>
+                            <button id="settings_save_general" class="settings_add_rem" style="font-size:13px; height:32px; width:100%;">Save</button>
+                        </div>
+                    </div>
+                    
+                </div>
+            
+                <!--SYSTEM SETTINGS-->
                 <div id="settings_editor">
                 
                     <!--EMU EXE-->
@@ -70,7 +155,7 @@
                     <!--EMU EXE-->
                     <div class="settings_category" style="display:inline-block; margin-bottom:2px;">
                         <div class="settings_label">Emulator Executable Path</div>
-                        <div style="display: grid; grid-template-columns: 1fr 32px 32px;">
+                        <div style="display: grid; grid-template-columns: 1fr 28px 28px;">
                             <input class="settings_emu_path settings_input">
                             <button class="settings_add_rem settings_input_make_relative" title="Make Path Relative">&#x21C4;</button>
                             <button class="settings_add_rem settings_input_get_path" title="Search File">&#x1f4c4;</button>
@@ -83,13 +168,13 @@
                         <!--INPUT CONTAINER : EMU ARGS LIST-->
                         <div style="display:grid; row-gap:2px;">
                             <!--INPUT CONTAINER : EMU ARG-->
-                            <div style="display: grid; grid-template-columns: 1fr 32px 32px 32px 32px 32px;" >
+                            <div style="display: grid; grid-template-columns: 1fr 28px 28px 28px 28px 28px;" >
                                 <input class="settings_emu_arg settings_input">
                                 <button class="settings_add_rem settings_input_make_relative" title="Make Path Relative">&#x21C4;</button>
                                 <button class="settings_add_rem settings_input_get_directory" title="Search Directory">&#x1F4C1;</button>
                                 <button class="settings_add_rem settings_input_get_path" title="Search File">&#x1f4c4;</button>
-                                <button class="settings_add_rem settings_input_add">&#xFF0B;</button>
-                                <button class="settings_add_rem settings_input_rem">&#xFF0D;</button>
+                                <button class="settings_add_rem settings_input_add" title="Add Argument">&#xFF0B;</button>
+                                <button class="settings_add_rem settings_input_rem" title="Remove Argument">&#xFF0D;</button>
                             </div>
                         </div>
                     </div>
@@ -100,13 +185,13 @@
                         <!--INPUT CONTAINER : ROM DIR LIST-->
                         <div style="display:grid; row-gap:2px;">
                             <!--INPUT CONTAINER : ROM DIR-->
-                            <div style="display: grid; grid-template-columns: 1fr 32px 32px 32px 32px 32px;" >
+                            <div style="display: grid; grid-template-columns: 1fr 28px 28px 28px 28px 28px;" >
                                 <input class="settings_rom_dir settings_input">
                                 <button class="settings_add_rem settings_input_make_relative" title="Make Directory Relative">&#x21C4;</button>
                                 <button class="settings_add_rem settings_input_get_directory" title="Search Directory">&#x1F4C1;</button>
                                 <button class="settings_add_rem settings_input_directory_recursive" title="Half: Include Only This Folder (Default)">🌜</button>
-                                <button class="settings_add_rem settings_input_add">&#xFF0B;</button>
-                                <button class="settings_add_rem settings_input_rem">&#xFF0D;</button>
+                                <button class="settings_add_rem settings_input_add" title="Add Directory">&#xFF0B;</button>
+                                <button class="settings_add_rem settings_input_rem" title="Remove Directory">&#xFF0D;</button>
                             </div>
                         </div>
                     </div>
@@ -117,10 +202,10 @@
                         <!--INPUT CONTAINER : FILE TYPES LIST-->
                         <div style="display:grid; row-gap:2px;">
                             <!--INPUT CONTAINER : FILE TYPE-->
-                            <div style="display: grid; grid-template-columns: 1fr 32px 32px;" >
+                            <div style="display: grid; grid-template-columns: 1fr 28px 28px;" >
                                 <input class="settings_file_type settings_input">
-                                <button class="settings_add_rem settings_input_add">&#xFF0B;</button>
-                                <button class="settings_add_rem settings_input_rem">&#xFF0D;</button>
+                                <button class="settings_add_rem settings_input_add" title="Add File Type">&#xFF0B;</button>
+                                <button class="settings_add_rem settings_input_rem" title="Remove File Type">&#xFF0D;</button>
                             </div>
                         </div>
                     </div>
@@ -159,7 +244,7 @@
                         <button id="settings_editor_message_close">&#x2573;</button>
                     </div>
                     
-                    <div class="settings_category">
+                    <div class="settings_category" id="settings_system_save_options">
                         <div style="display: grid; grid-template-columns: 30% 70%; column-gap: 2px;" >
                             <button id="settings_delete_system" class="settings_add_rem" style="font-size:13px; height:32px; width:100%;">Delete</button>
                             <button id="settings_save_system" class="settings_add_rem" style="font-size:13px; height:32px; width:100%;">Save</button>
