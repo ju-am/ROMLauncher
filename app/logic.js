@@ -89,6 +89,7 @@ function onEmulatorError(err) {
 
 function killEmulator() {
     if (emulator) {
+        console.log('kill-emulator : attempting to kill emulator');
         emulator.kill();
     }
 }
@@ -553,18 +554,20 @@ function saveGeneralSettings() {
     }
     
     // Parse general options here
-    
     if ($('.settings_controller_enabled').text() !== '') {
         settings.general.controllerEnabled = true;
     } else {
         settings.general.controllerEnabled = false;
     }
-    
     if ($('.settings_controller_forcequit').text() !== '') {
         settings.general.controllerForceQuit = true;
     } else {
         settings.general.controllerForceQuit = false;
     }
+    settings.general.buttonMapping = [];
+    $('.controller_mapping').each(function() {
+        settings.general.buttonMapping.push($(this).val().toString());
+    });
     
 
     // Write system changes to disk
@@ -602,6 +605,57 @@ function loadGeneralSettings() {
             $('.settings_controller_forcequit').text(settings.general.controllerForceQuit ? '✓' : '');
             // Enable controller force quit
             controllerForceQuit = settings.general.controllerForceQuit;
+        }
+        let mappingIndex = 0;
+        if (settings.general.hasOwnProperty('buttonMapping')) {
+            
+            settings.general.buttonMapping.forEach(function(value) {
+                let buttonValue = parseInt(value);
+                if (!isNaN(buttonValue)) {
+                    $('.controller_mapping').eq(mappingIndex).val(buttonValue);
+                }
+                switch(mappingIndex) {
+                    case 0:
+                    gpUpButton = buttonValue;
+                    break;
+                    case 1:
+                    gpDownButton = buttonValue;
+                    break;
+                    case 2:
+                    gpLeftButton = buttonValue;
+                    break;
+                    case 3:
+                    gpRightButton = buttonValue;
+                    break;
+                    case 4:
+                    gpAButton = buttonValue;
+                    break;
+                    case 5:
+                    gpBButton = buttonValue;
+                    break;
+                    case 6:
+                    gpLButton = buttonValue;
+                    break;
+                    case 7:
+                    gpRButton = buttonValue;
+                    break;
+                    case 8:
+                    forceQuitButtons.push(buttonValue);
+                    break;
+                    case 9:
+                    forceQuitButtons.push(buttonValue);
+                    break;
+                    case 10:
+                    forceQuitButtons.push(buttonValue);
+                    break;
+                    case 11:
+                    forceQuitButtons.push(buttonValue);
+                    break;
+                    default:
+                    break;
+                }
+                mappingIndex++;
+            });
         }
     }
 }

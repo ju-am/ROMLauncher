@@ -63,7 +63,7 @@
                     <div class="settings_category" style="display:inline-block; margin-bottom:2px;">
                         <div style="display: grid; grid-template-columns: 1fr; margin-top: 2px;">
                             <div class="settings_label">
-                                ROM Launcher Version 1.2
+                                ROM Launcher Version 1.2c
                                 <br>
                                 <span style="opacity: 0.6">
                                 By ButcheredGenre / TLOZ
@@ -89,27 +89,58 @@
                     <div class="settings_category" style="display:inline-block; margin-bottom:2px;">
                         <div style="display: grid; grid-template-columns: 1fr 28px; margin-top: 2px;">
                             <div class="settings_label">
-                                Enable Controller Input (Experimental)
+                                Enable Controller Input
                                 <br><br>
                                 <span style="opacity: 0.6">
-                                Navigate the interface using the D-Pad. Load a system or launch a game by pressing the 'A' button. You may need to click on an element before controller input starts working. Only XInput (Xbox) controllers are officially supported.
-                                <br><br>
-                                Please send me feedback on experimental features, if you have any.
-                                </span>
+                                Navigate the interface using a controller.
                             </div>
                             <button class="settings_checkbox settings_controller_enabled"></button>
                         </div>
                     </div>
                     
                     <div class="settings_category" style="display:inline-block; margin-bottom:2px;">
+                        <div class="settings_label">
+                            Controller Mapping
+                            <br><br>
+                            <span style="opacity: 0.6">
+                            Make sure controller input is enabled before remapping. You may need to save &amp; restart the launcher if you've just enabled controller input.<br><br>
+                            Click on the button you want to map, then press a button on your controller.
+                            <br>
+                            <br>A : Confirm. B : Back. L and R : Skip through ROM list.
+                            <br>Q : Up to 4 buttons to quit the running emulator, if the feature is enabled.
+                            </span>
+                        </div>
+                        <div style="display: grid;">
+                            <div style="margin-left: 6px; position: relative; height: 128px; background-image: url(./img/controllerMapping.svg); background-repeat: no-repeat;">
+                                <input class="controller_mapping" placeholder="&#x2191;" style="position: absolute; left: 44px; top: 19px;"><!--Up-->
+                                <input class="controller_mapping" placeholder="&#x2193;" style="position: absolute; left: 44px; top: 82px;"><!--Down-->
+                                <input class="controller_mapping" placeholder="&#x2190;" style="position: absolute; left: 12px; top: 50px;"><!--Left-->
+                                <input class="controller_mapping" placeholder="&#x2192;" style="position: absolute; left: 76px; top: 50px;"><!--Right-->
+                                
+                                <input class="controller_mapping" placeholder="A" style="position: absolute; left: 124px; top: 28px;">
+                                <input class="controller_mapping" placeholder="B" style="position: absolute; left: 172px; top: 28px;">
+                                <input class="controller_mapping" placeholder="L" style="position: absolute; left: 220px; top: 28px;">
+                                <input class="controller_mapping" placeholder="R" style="position: absolute; left: 268px; top: 28px;">
+                                
+                                <input class="controller_mapping" placeholder="Q" style="position: absolute; left: 124px; top: 76px;">
+                                <input class="controller_mapping" placeholder="Q" style="position: absolute; left: 172px; top: 76px;">
+                                <input class="controller_mapping" placeholder="Q" style="position: absolute; left: 220px; top: 76px;">
+                                <input class="controller_mapping" placeholder="Q" style="position: absolute; left: 268px; top: 76px;">
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 30% 70%;">
+                            <div></div>
+                            <button class="settings_add_rem" style="width: 100%; font-size: 13px;" onclick="clearControllerMapping();">Clear Custom Mapping</button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings_category" style="display:inline-block; margin-bottom:2px;">
                         <div style="display: grid; grid-template-columns: 1fr 28px; margin-top: 2px;">
                             <div class="settings_label">
-                                Force Quit Emulator Using L3+R3 (Experimental)
+                                Quit Emulator Using Button Combo
                                 <br><br>
                                 <span style="opacity: 0.6">
-                                Quit the launched emulator using a controller's L3 and R3 buttons (pressing in both analog sticks at the same time). Requires controller input to be enabled.
-                                <br><br>
-                                Please send me feedback on experimental features, if you have any.
+                                Quit the launched emulator using the button combo specified in the controller mapping section. You need to map at least two buttons. An exotic button combo (e.g. something including L3 or R3) is recommended. Requires controller input to be enabled.
                                 </span>
                             </div>
                             <button class="settings_checkbox settings_controller_forcequit"></button>

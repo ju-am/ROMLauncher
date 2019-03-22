@@ -311,6 +311,33 @@ html, body {
     margin-right: 2px;
 }
 
+.controller_mapping {
+    height: 28px;
+    width: 28px;
+    box-sizing: border-box;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    outline: none;
+    border: 2px solid white;
+    color: white;
+}
+
+.controller_mapping:hover {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.controller_mapping::placeholder {
+    font-family: notojp-reg;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.controller_mapping:focus {
+    background: rgba(0, 0, 0, 0.4);
+    border: 4px solid white;
+}
+
 #settings_editor_message {
     padding: 18px 44px 18px 18px;
     font-size: 13px;

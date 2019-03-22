@@ -2,7 +2,7 @@ var controllerInputEnabled = false;
 var controllerForceQuit = false;
 
 // default x-input button mappings for emulator force quit
-var forceQuitButtons = [10, 11];
+var forceQuitButtons = [];
 
 // default x-input button mappings
 var gpUpButton = 12;
@@ -11,6 +11,8 @@ var gpLeftButton = 14;
 var gpRightButton = 15;
 var gpAButton = 0;
 var gpBButton = 1;
+var gpLButton = 4;
+var gpRButton = 5;
 
 var gpUpButtonFrames = -1;
 var gpDownButtonFrames = -1;
@@ -18,6 +20,8 @@ var gpLeftButtonFrames = -1;
 var gpRightButtonFrames = -1;
 var gpAButtonFrames = -1;
 var gpBButtonFrames = -1;
+var gpLButtonFrames = -1;
+var gpRButtonFrames = -1;
 
 window.addEventListener("gamepadconnected", (event) => {
   console.log("Gamepad connected.");
@@ -58,6 +62,20 @@ function controllerUpdate() {
                         if (index === forceQuitButtons[i]) {
                             forceQuitCheck[i] = true;
                         }
+                    }
+                }
+                
+                // Button Mapping : Set value if current element is button mapping input
+                if ($(document.activeElement).hasClass('controller_mapping')) {
+                    let alreadyMapped = false;
+                    $('.controller_mapping').each(function() {
+                        if ($(this).val().toString() === index.toString()) {
+                            alreadyMapped = true;
+                        }
+                    });
+                    if (!alreadyMapped) {
+                        $(document.activeElement).val(index);
+                        $(document.activeElement).next().focus();
                     }
                 }
                 
@@ -120,6 +138,18 @@ function controllerUpdate() {
                         }
                     }
                 }
+                else if (index === gpLButton && controllerInputFocus) {
+                    gpLButtonFrames++;
+                    if (gpLButtonFrames === 0) {
+                        skipBack();
+                    }
+                }
+                else if (index === gpRButton && controllerInputFocus) {
+                    gpRButtonFrames++;
+                    if (gpRButtonFrames === 0) {
+                        skipForward();
+                    }
+                }
             }
             
             if (!button.pressed) {
@@ -141,6 +171,12 @@ function controllerUpdate() {
                 else if (index === gpBButton) {
                     if (gpBButtonFrames > -1) gpBButtonFrames = -1;
                 }
+                else if (index === gpLButton) {
+                    if (gpLButtonFrames > -1) gpLButtonFrames = -1;
+                }
+                else if (index === gpRButton) {
+                    if (gpRButtonFrames > -1) gpRButtonFrames = -1;
+                }
             }
         })
         
@@ -153,7 +189,9 @@ function controllerUpdate() {
                 }
             }
             if (forceQuitEmulator) {
-                killEmulator();
+                if (forceQuitButtons.length > 1) {
+                    killEmulator();
+                }
             }
         }
 
@@ -171,6 +209,12 @@ function controllerUpdate() {
     windowRaf(controllerUpdate);
 }
 
+function clearControllerMapping() {
+    $('.controller_mapping').each(function() {
+        $(this).val('');
+    });
+}
+
 var controllerInputFocus = true;
 
 function controllerInputBlurred() {
@@ -185,6 +229,7 @@ var lastSystemSelected = null;
 var lastRomSelected = null;
 
 function focusSystem() {
+    if (editMode) return;
     if ($(document.activeElement).hasClass('rom')) {
         lastRomSelected = $(document.activeElement);
         if (lastSystemSelected !== null) {
@@ -196,6 +241,7 @@ function focusSystem() {
 }
 
 function focusRomList() {
+    if (editMode) return;
     if ($(document.activeElement).hasClass('system')) {
         lastSystemSelected = $(document.activeElement);
         if (lastRomSelected !== null) {
@@ -210,6 +256,7 @@ function focusRomList() {
 }
 
 function focusNext(smooth) {
+    if (editMode) return;
     $(document.activeElement).next().focus();
     document.activeElement.scrollIntoView({
         behavior: (smooth ? 'smooth' : 'auto'),
@@ -219,12 +266,39 @@ function focusNext(smooth) {
 }
 
 function focusPrevious(smooth) {
+    if (editMode) return;
     $(document.activeElement).prev().focus();
     document.activeElement.scrollIntoView({
         behavior: (smooth ? 'smooth' : 'auto'),
         block: 'center',
         inline: 'center'
     });
+}
+
+function skipForward() {
+    if (editMode) return;
+    if ($(document.activeElement).hasClass('rom')) {
+        let firstLetter = $(document.activeElement).text().charAt(0);
+        $('.rom').each(function() {
+            if ($(this).text().charAt(0) > firstLetter) {
+                $(this).focus();
+                return false;
+            }
+        });
+    }
+}
+
+function skipBack() {
+    if (editMode) return;
+    if ($(document.activeElement).hasClass('rom')) {
+        let firstLetter = $(document.activeElement).text().charAt(0);
+        $($('.rom').get().reverse()).each(function() {
+            if ($(this).text().charAt(0) < firstLetter) {
+                $(this).focus();
+                return false;
+            }
+        });
+    }
 }
 
 var controllerStyle = false;
@@ -234,7 +308,7 @@ function enableControllerStyle() {
     $('link[href="./controllerInput.css"]').prop('disabled', false);
     controllerStyle = true;
     if (!$(document.activeElement).hasClass('system') && !$(document.activeElement).hasClass('rom')) {
-        $('.system').first().focus();
+        if (!editMode) $('.system').first().focus();
         // console.log($(document.activeElement));
     }
 }
