@@ -613,46 +613,47 @@ function loadGeneralSettings() {
                 let buttonValue = parseInt(value);
                 if (!isNaN(buttonValue)) {
                     $('.controller_mapping').eq(mappingIndex).val(buttonValue);
-                }
-                switch(mappingIndex) {
-                    case 0:
-                    gpUpButton = buttonValue;
-                    break;
-                    case 1:
-                    gpDownButton = buttonValue;
-                    break;
-                    case 2:
-                    gpLeftButton = buttonValue;
-                    break;
-                    case 3:
-                    gpRightButton = buttonValue;
-                    break;
-                    case 4:
-                    gpAButton = buttonValue;
-                    break;
-                    case 5:
-                    gpBButton = buttonValue;
-                    break;
-                    case 6:
-                    gpLButton = buttonValue;
-                    break;
-                    case 7:
-                    gpRButton = buttonValue;
-                    break;
-                    case 8:
-                    forceQuitButtons.push(buttonValue);
-                    break;
-                    case 9:
-                    forceQuitButtons.push(buttonValue);
-                    break;
-                    case 10:
-                    forceQuitButtons.push(buttonValue);
-                    break;
-                    case 11:
-                    forceQuitButtons.push(buttonValue);
-                    break;
-                    default:
-                    break;
+                    
+                    switch(mappingIndex) {
+                        case 0:
+                        gpUpButton = buttonValue;
+                        break;
+                        case 1:
+                        gpDownButton = buttonValue;
+                        break;
+                        case 2:
+                        gpLeftButton = buttonValue;
+                        break;
+                        case 3:
+                        gpRightButton = buttonValue;
+                        break;
+                        case 4:
+                        gpAButton = buttonValue;
+                        break;
+                        case 5:
+                        gpBButton = buttonValue;
+                        break;
+                        case 6:
+                        gpLButton = buttonValue;
+                        break;
+                        case 7:
+                        gpRButton = buttonValue;
+                        break;
+                        case 8:
+                        forceQuitButtons.push(buttonValue);
+                        break;
+                        case 9:
+                        forceQuitButtons.push(buttonValue);
+                        break;
+                        case 10:
+                        forceQuitButtons.push(buttonValue);
+                        break;
+                        case 11:
+                        forceQuitButtons.push(buttonValue);
+                        break;
+                        default:
+                        break;
+                    }
                 }
                 mappingIndex++;
             });
